@@ -29,7 +29,7 @@ app.register(require('./controllers/dashboard'), { 'prefix': '/donate' });
 const start = async () => {
   const port = +process.env.PORT || 3000;
   try {
-    const address = await app.listen(port);
+    const address = await app.listen(port, '0.0.0.0');
     console.log(`Server listening on ${address}`);
   } catch (err) {
     app.log.error(err);
