@@ -20,8 +20,27 @@ app.register(require('./plugins/knex'), {
     port: +process.env.DB_PORT,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME
-  }
+  },
+  pool: {
+    min: 0,
+    max: 7,
+    afterCreate: (conn, done) => {
+      conn.query('SET NAMES utf8', (err) => {
+        done(err, conn);
+      });
+    }
+  },
+  debug: false,
+  acquireConnectionTimeout: 5000
 });
+
+app.setErrorHandler(function (error, request, reply) {
+  var statusCode = error.statusCode >= 400 ? error.statusCode : 500
+  reply
+    .code(statusCode)
+    .type('text/plain')
+    .send(statusCode >= 500 ? `${statusCode} (Internal server error)` : error.message)
+})
 
 app.register(require('./controllers/index'));
 app.register(require('./controllers/dashboard'), { 'prefix': '/donate' });

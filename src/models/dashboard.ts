@@ -127,6 +127,8 @@ export class DashboardModel {
     async findCashNameFilter(db: Knex, data: any) {
         let object = data.object;
         let month = data.month;
+        let search = data.search;
+        let word = data.search.split(' ');
         let sql = `select d.id, CASE WHEN d.typename = 1 THEN "บุคคลธรรมดา" WHEN d.typename = 2 THEN "นิติบุคคล/บริษัท" 
             WHEN d.typename = 3 THEN "ผู้ไม่ประสงค์จะออกนาม" WHEN d.typename = 4 THEN "เงินเหลือจ่าย" END as typeperson,
             CASE WHEN d.typename = 1 THEN CONCAT(d.title,"",d.name," ",d.surname) 
@@ -139,9 +141,14 @@ export class DashboardModel {
             left join donate_foundation df on dc.foundation_id = df.foundation_id
             left join donate_objective dno on dc.objective_id = dno.objective_id
             left join donate_objectivedetail dnod on dc.objectivedetail_id = dnod.objectivedetail_id
-            where dca.category_id = '1' and dc.objective_id = '${object}'`;
+            where (dca.category_id = '1' and dc.objective_id = '${object}') `;
         if (month != '' && month != undefined) {
-            sql += `and DATE_FORMAT(d.donatedate, "%Y-%m") = '${month}' `;
+            sql += ` and DATE_FORMAT(d.donatedate, "%Y-%m") = '${month}' `;
+        }
+        if (word.length == 2) {
+            sql += ` and (d.name like '%${word[0].trim()}%' and d.surname like '%${word[1].trim()}%') `;
+        } else if (search != '' && search != undefined) {
+            sql += ` and d.name like '%${search.trim()}%' or d.surname like '%${search.trim()}%' or (d.companyname like '') `;
         }
         sql += ` order by d.donatedate asc;`;
         return await db.raw(sql);
