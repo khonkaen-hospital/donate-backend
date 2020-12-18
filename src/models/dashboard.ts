@@ -151,7 +151,6 @@ export class DashboardModel {
             sql += ` and (d.name like '%${search.trim()}%' or d.surname like '%${search.trim()}%' or d.companyname like '%${search.trim()}%') `;
         }
         sql += ` order by d.donatedate asc;`;
-        console.log(sql);
         return await db.raw(sql);
     }
 }
