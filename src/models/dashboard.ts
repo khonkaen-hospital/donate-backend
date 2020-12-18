@@ -148,9 +148,10 @@ export class DashboardModel {
         if (word.length == 2) {
             sql += ` and (d.name like '%${word[0].trim()}%' and d.surname like '%${word[1].trim()}%') `;
         } else if (search != '' && search != undefined) {
-            sql += ` and d.name like '%${search.trim()}%' or d.surname like '%${search.trim()}%' or (d.companyname like '') `;
+            sql += ` and (d.name like '%${search.trim()}%' or d.surname like '%${search.trim()}%' or d.companyname like '%${search.trim()}%') `;
         }
         sql += ` order by d.donatedate asc;`;
+        console.log(sql);
         return await db.raw(sql);
     }
 }
